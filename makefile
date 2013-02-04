@@ -1,10 +1,11 @@
-SOURCES = shuffle.c
+EXE = 
+SOURCES = 
 CC = clang
-CFLAGS = -Wextra -pedantic -Werror
+CFLAGS = -pedantic -Wextra -Werror
 
 default: debug
 
-shuffle: shuffle.o
+$(EXE): 
 
 %.o: %.c %.d
 
@@ -12,15 +13,15 @@ shuffle: shuffle.o
 
 debug: CFLAGS += -g
 debug: CPPFLAGS += -DDEBUG
-debug: shuffle
+debug: $(EXE)
 
 release: CPPFLAGS += -DNDEBUG
-release: shuffle
+release: $(EXE)
 
 .PHONY = clean
 
 clean:
-	rm -f *.o *.d shuffle
+	rm -f *.o *.d $(EXE)
 
 include $(subst .c,.d,$(SOURCES))
 
