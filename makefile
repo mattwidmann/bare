@@ -1,5 +1,6 @@
 EXE = 
 SOURCES = 
+
 CC = clang
 CFLAGS = -std=c11 -pedantic -Wextra -Werror
 
@@ -18,10 +19,13 @@ debug: $(EXE)
 release: CPPFLAGS += -DNDEBUG
 release: $(EXE)
 
-.PHONY = clean
+.PHONY = clean install
 
 clean:
 	rm -f *.o *.d $(EXE)
+
+install: release
+	cp $(EXE) ~/.bin/
 
 include $(subst .c,.d,$(SOURCES))
 
