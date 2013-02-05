@@ -1,7 +1,7 @@
 EXE = 
 SOURCES = 
 CC = clang
-CFLAGS = -pedantic -Wextra -Werror
+CFLAGS = -std=c11 -pedantic -Wextra -Werror
 
 default: debug
 
