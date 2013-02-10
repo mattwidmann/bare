@@ -6,7 +6,7 @@ CFLAGS = -std=c11 -pedantic -Wextra -Werror
 
 default: debug
 
-$(EXE): 
+$(EXE): $(SOURCES)
 
 %.o: %.c %.d
 
