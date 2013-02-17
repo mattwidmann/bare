@@ -24,11 +24,12 @@ release: $(EXE)
 clean:
 	rm -f *.o *.d $(EXE)
 
-install: release
-	cp $(EXE) ~/.bin/
+DIR ?= ~/.bin/
 
-include $(subst .c,.d,$(SOURCES))
+install: release
+	cp $(EXE) $(DIR)
 
 %.d: %.c
 	$(CC) $(CPPFLAGS) -MM -MG $< | sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' > $@
 
+include $(subst .c,.d,$(SOURCES))
