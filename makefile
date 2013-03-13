@@ -1,5 +1,5 @@
 EXE = 
-SOURCES = 
+OBJECTS = 
 
 CC = clang
 CFLAGS = -std=c11 -pedantic -Wextra -Werror
@@ -32,4 +32,4 @@ install: release
 %.d: %.c
 	$(CC) $(CPPFLAGS) -MM -MG $< | sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' > $@
 
-include $(subst .c,.d,$(SOURCES))
+include $(subst .o,.d,$(OBJECTS))
