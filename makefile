@@ -1,14 +1,18 @@
-EXE = 
-OBJECTS = 
+EXE = main
+OBJECTS = main.o
 
 CC = clang
 CFLAGS = -std=c11 -pedantic -Wextra -Werror
 
+MAKEDEPEND = $(CC) $(CPPFLAGS) -MM -MG $< | sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' > $*.d
+
 default: debug
 
-$(EXE): $(SOURCES)
+$(EXE): $(OBJECTS)
 
-%.o: %.c %.d
+%.o: %.c
+	$(MAKEDEPEND)
+	$(COMPILE.c) -o $@ $<
 
 .PHONY = debug release
 
@@ -29,7 +33,4 @@ DIR ?= ~/.bin/
 install: release
 	cp $(EXE) $(DIR)
 
-%.d: %.c
-	$(CC) $(CPPFLAGS) -MM -MG $< | sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' > $@
-
-include $(subst .o,.d,$(OBJECTS))
+-include $(OBJECTS:.o=.d)
