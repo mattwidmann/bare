@@ -1,36 +1,65 @@
-EXE = main
-OBJECTS = main.o
+CXX = g++
+CC = gcc
+CFLAGS = -Wall -Werror
+CPPFLAGS = 
+LDFLAGS = 
 
-CC = clang
-CFLAGS = -std=c11 -pedantic -Wextra -Werror
+MV := mv -f
+RM := rm -f
+SED := sed
 
-MAKEDEPEND = $(CC) $(CPPFLAGS) -MM -MG $< | sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' > $*.d
+# install directory
+DIR ?= ~/.bin/
 
-default: debug
+# extra include directories
+include_dirs :=
+CPPFLAGS += $(addprefix -I ,$(include_dirs))
+vpath %.h $(include_dirs)
 
-$(EXE): $(OBJECTS)
+sources := main.c
+products := main
 
-%.o: %.c
-	$(MAKEDEPEND)
-	$(COMPILE.c) -o $@ $<
+objects = $(patsubst %.c,%.o,$(sources))
+dependencies = $(patsubst %.c,%.d,$(sources))
 
-.PHONY = debug release
+# ensure that all is the default target
+release:
+
+# include makefiles in subdirectories
+
+.PHONY: test
+# add builds for tests
+
+.PHONY: clean
+clean:
+	$(RM) $(objects)
+	$(RM) $(products)
+	$(RM) $(dependencies)
+
+# include dependencies only if target is not clean
+ifneq "$(MAKECMDGOALS)" "clean"
+  -include $(dependencies)
+endif
+
+.PHONY: debug
 
 debug: CFLAGS += -g
 debug: CPPFLAGS += -DDEBUG
-debug: $(EXE)
+debug: $(products)
+
+.PHONY: release
 
 release: CPPFLAGS += -DNDEBUG
-release: $(EXE)
+release: $(products)
 
-.PHONY = clean install
-
-clean:
-	rm -f *.o *.d $(EXE)
-
-DIR ?= ~/.bin/
+.PHONY: install
 
 install: release
-	cp $(EXE) $(DIR)
+	cp $(products) $(DIR)
 
--include $(OBJECTS:.o=.d)
+# dependency generation
+%.d: %.c
+	$(CC) $(CFLAGS) $(CPPFLAGS) -M $< | \
+	$(SED) 's,\($*\.o\) *:,$(dir $@)\1 $@: ,' > $@.tmp
+	$(MV) $@.tmp $@
+
