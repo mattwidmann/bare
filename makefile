@@ -27,8 +27,12 @@ release:
 
 # include makefiles in subdirectories
 
-.PHONY: test
-# add builds for tests
+test: debug test/test
+	test/test
+
+ifeq "$(MAKECMDGOALS)" "test"
+  -include test/makefile.mk
+endif
 
 .PHONY: clean
 clean:
