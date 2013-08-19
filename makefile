@@ -26,13 +26,10 @@ dependencies = $(patsubst %.c,%.d,$(sources))
 release:
 
 # include makefiles in subdirectories
+include test/makefile.mk
 
 test: debug test/test
 	test/test
-
-ifeq "$(MAKECMDGOALS)" "test"
-  -include test/makefile.mk
-endif
 
 .PHONY: clean
 clean:
