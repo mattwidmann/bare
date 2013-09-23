@@ -6,8 +6,9 @@
 #include <errno.h>
 #include <string.h>
 #include <signal.h>
+#include <unistd.h>
 
-// logging
+/* logging */
 
 #ifdef NDEBUG
 #define DBG(Message, ...)
@@ -17,7 +18,7 @@
 #define ERROR(Message, ...) fprintf(stderr, "ERROR: " Message " (%s:%d%s%s)\n", ##__VA_ARGS__, __FILE__, __LINE__, (errno == 0 ? "" : ", errno: "), (errno == 0 ? "" : strerror(errno))); errno = 0
 #endif
 
-// assertions
+/* assertions */
 
 #define CHECK(Condition, Action, Message, ...) if (!(Condition)) { ERROR(Message, ##__VA_ARGS__); Action }
 #define CHECK_DBG(Condition, Message, ...) if (!(Condition)) { DBG(Message, ##__VA_ARGS__); }
@@ -25,7 +26,7 @@
 #define CHECK_EXIT(Condition, Message, ...) CHECK((Condition), exit(EXIT_FAILURE);, Message, ##__VA_ARGS__)
 #define CHECK_MEM(Condition) CHECK_EXIT((Condition), "out of memory")
 
-void print_backtrace(int)
+void print_backtrace(int signum)
 {
     pid_t dying_pid = getpid();
     pid_t child_pid = fork();

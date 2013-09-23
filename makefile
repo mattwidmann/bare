@@ -1,63 +1,32 @@
+PREFIX ?= /usr/local
+SRC = main.c
+OBJ = $(SRC:.c=.o)
+INC = ext
+BIN = main
+
 CXX = g++
 CC = gcc
-CFLAGS = -Wall -Werror
-CPPFLAGS = 
-LDFLAGS = 
+CFLAGS = -Wall -Werror -std=c89
+CPPFLAGS = -I $(INC)
 
-MV := mv -f
-RM := rm -f
-SED := sed
+$(BIN): $(OBJ)
+	$(CC) $^ -o $@
 
-# install directory
-DIR ?= ~/.bin/
-
-# extra include directories
-include_dirs :=
-CPPFLAGS += $(addprefix -I ,$(include_dirs))
-vpath %.h $(include_dirs)
-
-sources := main.c
-products := main
-
-objects = $(patsubst %.c,%.o,$(sources))
-dependencies = $(patsubst %.c,%.d,$(sources))
-
-# ensure that all is the default target
-release:
-
-# include makefiles in subdirectories
-test: debug
-
-.PHONY: clean
-clean:
-	$(RM) $(objects)
-	$(RM) $(products)
-	$(RM) $(dependencies)
-
-# include dependencies only if target is not clean
-ifneq "$(MAKECMDGOALS)" "clean"
-  -include $(dependencies)
-endif
-
-.PHONY: debug
+%.o: %.c
+	$(CC) $< $(CFLAGS) $(CPPFLAGS) -c -o $@
 
 debug: CFLAGS += -g
 debug: CPPFLAGS += -DDEBUG
-debug: $(products)
+debug: $(BIN)
 
-.PHONY: release
+clean:
+	rm -f $(BIN) $(OBJ)
 
-release: CPPFLAGS += -DNDEBUG
-release: $(products)
+install: $(BIN)
+	cp -f $(BIN) $(PREFIX)/bin/$(BIN)
 
-.PHONY: install
+uninstall: $(BIN)
+	rm -f $(PREFIX)/bin/$(BIN)
 
-install: release
-	cp $(products) $(DIR)
-
-# dependency generation
-%.d: %.c
-	$(CC) $(CFLAGS) $(CPPFLAGS) -M $< | \
-	$(SED) 's,\($*\.o\) *:,$(dir $@)\1 $@: ,' > $@.tmp
-	$(MV) $@.tmp $@
+.PHONY: debug clean install uninstall
 
